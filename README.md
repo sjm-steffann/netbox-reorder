@@ -1,5 +1,7 @@
 # NetBox plugin to order interfaces more intuitively
 
+> :warning: **This plugin hacks into NetBox**: This plugin definitely does not follow the supported plugin protocol, and can break NetBox!
+
 ## Compatibility
 
 This plugin in compatible with [NetBox](https://netbox.readthedocs.org/) 2.8. Because of the way this plugin hacks into the internals of NetBox compatibility with other versions is not guaranteed.
