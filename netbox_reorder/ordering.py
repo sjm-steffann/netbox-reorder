@@ -15,35 +15,37 @@ def naturalize_interface(value, max_length):
     :param value: The value to be naturalized
     :param max_length: The maximum length of the returned string. Characters beyond this length will be stripped.
     """
-    output = ''
     match = re.search(INTERFACE_NAME_REGEX, value)
     if match is None:
         return value
 
-    # First, we order by slot/position, padding each to four digits. If a field is not present,
-    # set it to 9999 to ensure it is ordered last.
-    for part_name in ('slot', 'subslot', 'position', 'subposition', 'id'):
-        part = match.group(part_name)
-        if part is not None:
-            output += part.rjust(4, '0')
-        else:
-            output += '9999'
+    matches = match.groupdict()
 
-    # Append the type, if any.
-    if match.group('type') is not None:
-        output += match.group('type')
+    # Add padding
+    for part in ('slot', 'subslot', 'position', 'subposition'):
+        matches[part] = matches[part].rjust(4, '0') if matches[part] else '9999'
 
-    # Append any remaining fields, left-padding to six digits each.
-    for part_name in ('channel', 'vc'):
-        part = match.group(part_name)
-        if part is not None:
-            output += part.rjust(6, '0')
-        else:
-            output += '......'
+    for part in ('id', 'channel', 'vc'):
+        matches[part] = matches[part].rjust(6, '0') if matches[part] else '......'
+
+    matches['type'] = matches['type'] or ''
+    matches['remainder'] = matches['remainder'] or ''
+
+    # Apply heuristics to interface type
+    if matches['type'].lower() in ('vl', 'vlan'):
+        matches['slot'] = '9996'
+    if matches['type'].lower() in ('lo', 'loopback'):
+        matches['slot'] = '9997'
+    if matches['type'].lower() in ('ae', 'po', 'port-channel'):
+        matches['slot'] = '9998'
+
+    # Format output
+    output = (matches['slot'] + matches['subslot'] + matches['position'] + matches['subposition'] + matches['id'] +
+              matches['type'] + matches['channel'] + matches['vc'])
 
     # Finally, naturalize any remaining text and append it
-    if match.group('remainder') is not None and len(output) < max_length:
-        remainder = naturalize(match.group('remainder'), max_length - len(output))
+    if matches['remainder'] and len(output) < max_length:
+        remainder = naturalize(matches['remainder'], max_length - len(output))
         output += remainder
 
     return output[:max_length]
