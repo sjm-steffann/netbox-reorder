@@ -6,6 +6,11 @@
 
 This plugin in compatible with [NetBox](https://netbox.readthedocs.org/) 2.8. Because of the way this plugin hacks into the internals of NetBox compatibility with other versions is not guaranteed.
 
+NetBox 2.10 introduced breaking
+changes that make it unusable for my own use cases, so I will not be providing support for it. There is work being done
+to create a fork of NetBox that is friendlier to both network operators and contributors. My future work will be in
+support of that.
+
 ## Installation
 
 First, add `netbox_reorder` to your `/opt/netbox/local_requirements.txt` file. Create it if it doesn't exist.
